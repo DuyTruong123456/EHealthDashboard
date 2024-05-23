@@ -2,4 +2,6 @@
     <string name="app_name">Kiossk Dashboard</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="submit">Test</string>
+    <string name="AR">Go to AR</string>
 </resources>

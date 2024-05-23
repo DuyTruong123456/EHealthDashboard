@@ -4,7 +4,12 @@ import android.annotation.SuppressLint;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,14 +19,17 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import npnlab.smart.algriculture.kiosskdashboard.databinding.ActivityFullscreenBinding;
-
+import android.Manifest;
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenActivity extends AppCompatActivity {
+public class FullscreenActivity extends AppCompatActivity implements View.OnClickListener{
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -41,6 +49,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler(Looper.myLooper());
     private View mContentView;
+
+
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -105,11 +115,16 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
     private ActivityFullscreenBinding binding;
-
+    private static final int REQUEST_MICROPHONE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Request the permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_MICROPHONE);
+        }
         binding = ActivityFullscreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -121,6 +136,7 @@ public class FullscreenActivity extends AppCompatActivity {
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 toggle();
             }
         });
@@ -128,7 +144,7 @@ public class FullscreenActivity extends AppCompatActivity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        binding.dummyButton.setOnTouchListener(mDelayHideTouchListener);
+     //   binding.dummyButton.setOnTouchListener(mDelayHideTouchListener);
 
         // Find the WebView by its unique ID
         WebView webView = findViewById(R.id.webContent);
@@ -143,6 +159,21 @@ public class FullscreenActivity extends AppCompatActivity {
         // WebViewClient allows you to handle
         // onPageFinished and override Url loading.
         webView.setWebViewClient(new WebViewClient());
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)             {
+                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.bkuaclab.ar");
+                if (launchIntent != null) { // Check if the Intent exists
+                    startActivity(launchIntent); // Start the application
+                } else {
+                    Toast.makeText(getApplicationContext(), "Application not found", Toast.LENGTH_SHORT).show();
+                    Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse( "https://drive.usercontent.google.com/download?id=1cpb6PfdBTdI-8RIExb7gwZSG05O8pmpT&export=download&authuser=0" ) );
+
+                    startActivity( browse );
+                }
+            }
+        });
     }
 
     @Override
@@ -200,5 +231,20 @@ public class FullscreenActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+    public void onBackARButtonClick(View view) {
+        Toast.makeText(getApplicationContext(), "pressingButton", Toast.LENGTH_SHORT).show();
+       /* Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.bkuaclab.ar");
+        if (launchIntent != null) { // Check if the Intent exists
+            startActivity(launchIntent); // Start the application
+        } else {
+            Toast.makeText(getApplicationContext(), "Application not found", Toast.LENGTH_SHORT).show();
+        }
+        */
+
+    }
+    @Override
+    public void onClick(View view) {
+
     }
 }
